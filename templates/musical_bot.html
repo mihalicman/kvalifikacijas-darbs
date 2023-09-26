@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/musical_bot.css">
+    <title>Musical Bot</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Musical Bot</h1>
+        </header>
+        <main>
+            <section class="input-section">
+                <label for="noteInput">Enter a sequence of notes (e.g., CDEFGAB):</label>
+                <div class="input-container">
+                    <input type="text" id="noteInput" placeholder="e.g., CDEFGAB">
+                    <button onclick="generateMelody()">Generate Melody</button>
+                </div>
+            </section>
+            <section class="output-section">
+                <div id="output"></div>
+                <!-- Message to indicate when the melody is playing -->
+                <p id="playing-message" style="display: none;">Playing the melody...</p>
+            </section>
+            <section class="additional-section">
+                <button class="function-button" onclick="playFunction1()">Function 1</button>
+                <button class="function-button" onclick="playFunction2()">Function 2</button>
+                <button class="function-button" onclick="playFunction3()">Function 3</button>
+                <button onclick="generateRandomMelody()">Generate Random Melody</button>
+                <!-- Add an audio element for playback -->
+                <audio id="melody-audio" controls style="display: none;"></audio>
+            </section>            
+        </main>
+    </div>
+
+    <!-- Include MIDI.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/midijs@0.4.2/midi.js"></script>
+
+    <script>
+        function generateRandomMelody() {
+            // Display the "Playing the melody..." message
+            const playingMessage = document.getElementById("playing-message");
+            playingMessage.style.display = "block";
+
+            fetch("/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ notes: "random" }),  // Send "random" as notes
+            })
+                .then((response) => response.blob())
+                .then((data) => {
+                    const blob = new Blob([data], { type: "audio/midi" });
+
+                    // Use MIDI.js to play the MIDI file
+                    MIDIjs.play(blob);
+
+                    // Show the audio element for playback
+                    const audioElement = document.getElementById("melody-audio");
+                    audioElement.src = URL.createObjectURL(blob);
+                    audioElement.style.display = "block";
+
+                    // Hide the "Playing the melody..." message after a delay
+                    setTimeout(() => {
+                        playingMessage.style.display = "none";
+                    }, 3000); // Adjust the delay as needed
+                });
+        }
+
+        function playFunction1() {
+            const audioElement = document.getElementById("melody-audio");
+            audioElement.src = "/static/songs/kai-angel-9mice-thrilleya-mp3.mp3";
+            audioElement.style.display = "block";
+            audioElement.play();
+        }
+
+        function playFunction2() {
+            const audioElement = document.getElementById("melody-audio");
+            audioElement.src = "/static/songs/travis-scott-fe-n-mp3.mp3";
+            audioElement.style.display = "block";
+            audioElement.play();
+        }
+        
+        function playFunction3() {
+            const audioElement = document.getElementById("melody-audio");
+            audioElement.src = "/static/songs/Kai Angel - PARIS 2008.mp3"; // Replace with the actual path to your song
+            audioElement.style.display = "block";
+            audioElement.play();
+        }
+
+    </script>
+</body>
+</html>
